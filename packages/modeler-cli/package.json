@@ -1,0 +1,29 @@
+{
+  "name": "modeler-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Szymon Kaliski <hi@szymonkaliski.com> (http://szymonkaliski.com)",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/core": "^7.4.0",
+    "@babel/preset-react": "^7.0.0",
+    "@swc/core": "^1.0.39",
+    "babelify": "^10.0.0",
+    "browserify": "^16.2.3",
+    "chokidar": "^2.1.5",
+    "get-port": "^4.2.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-three-fiber": "^1.5.3",
+    "swcify": "^1.0.1",
+    "three": "^0.103.0",
+    "three-orbitcontrols": "^2.102.1",
+    "watchify-middleware": "^1.8.1",
+    "yargs": "^13.2.2"
+  }
+}
