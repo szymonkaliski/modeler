@@ -1,0 +1,20 @@
+{
+  "name": "modeler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Szymon Kaliski <hi@szymonkaliski.com> (http://szymonkaliski.com)",
+  "license": "MIT",
+  "dependencies": {
+    "@jscad/csg": "^0.7.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-three-fiber": "^1.5.3",
+    "three": "^0.103.0",
+    "three-orbitcontrols": "^2.102.1"
+  }
+}

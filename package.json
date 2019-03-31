@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "publish:init": "lerna exec 'npm publish --access public'",
+    "publish": "lerna publish"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "lerna": "^3.13.1"
+  }
+}
