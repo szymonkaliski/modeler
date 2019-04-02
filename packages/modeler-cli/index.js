@@ -52,18 +52,23 @@ vendorBundler.bundle((err, vendor) => {
     const server = createServer((req, res) => {
       if (req.url === "/") {
         res.end(`
-      <html>
-        <head>
-          <title>modeler: ${modelFile}</title>
-        </head>
-        <body>
-          <div id="root"></div>
-          <script>${vendor}</script>
-          <script src="/${modelFile.replace(/^\.\//, "")}"></script>
-          <script>${bundled}</script>
-        </body>
-      </html>
-    `);
+          <html>
+            <head>
+              <title>modeler: ${modelFile}</title>
+              <style>
+                body {
+                  margin: 0;
+                }
+              </style>
+            </head>
+            <body>
+              <div id="root"></div>
+              <script>${vendor}</script>
+              <script src="/${modelFile.replace(/^\.\//, "")}"></script>
+              <script>${bundled}</script>
+            </body>
+          </html>
+        `);
       } else if (req.url.includes(modelFile.replace(/^\.\//, ""))) {
         watchify(req, res);
       }
