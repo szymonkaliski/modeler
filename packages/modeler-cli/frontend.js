@@ -1,16 +1,34 @@
 const OrbitControls = require("three-orbitcontrols");
 const React = require("react");
 const ReactDOM = require("react-dom");
+const load = require("load-script2");
 const { Canvas, useThree } = require("react-three-fiber");
+const { ClientSocket, useSocket } = require("use-socketio");
 const { SphereGeometry, MeshBasicMaterial } = require("three");
 
-const { useRef, useEffect } = React;
+const { useRef, useEffect, useState } = React;
 
 const DEBUG_LIGHT = false;
 
 const Main = () => {
   const { camera, canvas } = useThree();
   const orbitControls = useRef();
+  const [modelFn, setModelFn] = useState(null);
+
+  const loadModel = () => {
+    load(`/${window.MODELER_NAME}`, err => {
+      if (err) {
+        return console.error(err);
+      }
+
+      if (window.MODELER_MODEL) {
+        setModelFn(window.MODELER_MODEL);
+      }
+    });
+  };
+
+  useSocket("reload", () => loadModel());
+  useEffect(() => loadModel(), []);
 
   useEffect(() => {
     orbitControls.current = new OrbitControls(camera, canvas);
@@ -36,15 +54,17 @@ const Main = () => {
       <gridHelper args={[100, 1000, 0xbbbbbb, 0xcccccc]} />
       <gridHelper args={[100, 100, 0x888888, 0x888888]} />
 
-      {window.MODELER_MODEL()}
+      {modelFn}
     </>
   );
 };
 
 const App = () => (
-  <div style={{ width: "100vw", height: "100vh"}}>
+  <div style={{ width: "100vw", height: "100vh" }}>
     <Canvas style={{ background: "#dddddd" }}>
-      <Main />
+      <ClientSocket url={document.location.origin}>
+        <Main />
+      </ClientSocket>
     </Canvas>
   </div>
 );

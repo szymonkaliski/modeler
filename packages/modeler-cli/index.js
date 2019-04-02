@@ -1,11 +1,12 @@
 const browserify = require("browserify");
 const chokidar = require("chokidar");
+const createSocket = require("socket.io");
 const fs = require("fs");
 const getPort = require("get-port");
+const path = require("path");
 const watchifyMiddleware = require("watchify-middleware");
 const { argv } = require("yargs");
 const { createServer } = require("http");
-const path = require("path");
 
 const [modelFile] = argv._;
 const port = argv.port || 3000;
@@ -37,47 +38,67 @@ const vendorBundler = browserify()
   .require("react")
   .require("react-dom");
 
+const run = ({ scripts }) => {
+  const server = createServer((req, res) => {
+    if (req.url === "/") {
+      res.end(`
+        <html>
+          <head>
+            <title>modeler: ${modelFile}</title>
+            <style>
+              body {
+                margin: 0;
+              }
+            </style>
+          </head>
+          <body>
+            <div id="root"></div>
+            <script>
+              window.MODELER_NAME = "${modelFile.replace(/^\.\//, "")}"
+            </script>
+            <script>${scripts.vendor}</script>
+            <script>${scripts.frontend}</script>
+          </body>
+        </html>
+      `);
+    } else if (req.url.includes(modelFile.replace(/^\.\//, ""))) {
+      watchify(req, res);
+    }
+  });
+
+  const connections = {};
+  const io = createSocket(server);
+
+  io.on("connection", socket => {
+    connections[socket.id] = socket;
+    socket.on("disconnect", () => delete connections[socket.id]);
+  });
+
+  chokidar
+    .watch(modelFile)
+    .on("all", () =>
+      Object.values(connections).forEach(socket => socket.emit("reload"))
+    );
+
+  getPort({ port }).then(port =>
+    server.listen(port, () =>
+      console.log(`running on http://localhost:${port}`)
+    )
+  );
+};
+
 vendorBundler.bundle((err, vendor) => {
   if (err) {
     console.log(err);
     process.exit(1);
   }
 
-  frontendBundler.bundle((err, bundled) => {
+  frontendBundler.bundle((err, frontend) => {
     if (err) {
       console.log(err);
       process.exit(1);
     }
 
-    const server = createServer((req, res) => {
-      if (req.url === "/") {
-        res.end(`
-          <html>
-            <head>
-              <title>modeler: ${modelFile}</title>
-              <style>
-                body {
-                  margin: 0;
-                }
-              </style>
-            </head>
-            <body>
-              <div id="root"></div>
-              <script>${vendor}</script>
-              <script src="/${modelFile.replace(/^\.\//, "")}"></script>
-              <script>${bundled}</script>
-            </body>
-          </html>
-        `);
-      } else if (req.url.includes(modelFile.replace(/^\.\//, ""))) {
-        watchify(req, res);
-      }
-    });
-
-    getPort({ port }).then(port => {
-      server.listen(port, () => {
-        console.log(`running on http://localhost:${port}`);
-      });
-    });
+    run({ scripts: { vendor, frontend } });
   });
 });

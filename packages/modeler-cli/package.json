@@ -17,12 +17,16 @@
     "browserify": "^16.2.3",
     "chokidar": "^2.1.5",
     "get-port": "^4.2.0",
+    "load-script2": "^1.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-three-fiber": "^1.5.3",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
     "swcify": "^1.0.1",
     "three": "^0.103.0",
     "three-orbitcontrols": "^2.102.1",
+    "use-socketio": "^1.0.0",
     "watchify-middleware": "^1.8.1",
     "yargs": "^13.2.2"
   }
