@@ -1,9 +1,6 @@
 const React = require("react");
 const { Model, Cube, Sphere, Union, Subtract } = require("../../modeler");
 
-
-
-
 module.exports = () => (
   <Model>
     <Subtract>
