@@ -1,15 +1,23 @@
 const React = require("react");
-const { Model, Cube, Sphere, Union, Subtract } = require("../../modeler");
+const {
+  Model,
+  RoundedCube,
+  Sphere,
+  Union,
+  Subtract
+} = require("../../modeler");
 
 module.exports = () => (
   <Model>
-    <Subtract>
-      <Union>
-        <Cube />
-        <Sphere pos={[1, 0, 0]} />
-      </Union>
+    <Union>
+      <Subtract>
+        <Union>
+          <RoundedCube radius={[1, 0.1, 2]} />
+          <Sphere center={[1, 0, 0]} radius={1} />
+        </Union>
 
-      <Sphere pos={[0, 1, 0]} />
-    </Subtract>
+        <Sphere center={[0, 1, 0]} />
+      </Subtract>
+    </Union>
   </Model>
 );

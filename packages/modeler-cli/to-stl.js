@@ -3,7 +3,7 @@ const fs = require("fs");
 const { CSG } = require("@jscad/csg");
 const { stlSerializer } = require("@jscad/io");
 
-module.exports = ({ modelFile, outFile }) => {
+module.exports = ({ modelFile, outFile }) =>
   browserify(modelFile, {
     node: true,
     basedir: process.cwd()
@@ -13,12 +13,17 @@ module.exports = ({ modelFile, outFile }) => {
     .external("react-dom")
     .external("three")
     .bundle((err, code) => {
-      // console.log(code.toString())
+      let evaled;
 
-      const evaled = eval(code.toString());
+      try {
+        evaled = eval(code.toString());
+      } catch (err) {
+        console.error(err);
+        process.exit(1);
+      }
 
       if (evaled) {
-        // wild west below
+        // black magic below
 
         const createNode = evaled(1); // no idea why `1`
         const node = createNode();
@@ -26,7 +31,8 @@ module.exports = ({ modelFile, outFile }) => {
         // <Model /> allows only one child
         const firstChild = node.props.children;
 
-        const model = firstChild.type(firstChild.props);
+        // we only care about the model, not the parts
+        const [model, _] = firstChild.type(firstChild.props);
 
         const MM = 10;
 
@@ -39,4 +45,3 @@ module.exports = ({ modelFile, outFile }) => {
         fs.writeFileSync(outFile, rawData.join());
       }
     });
-};

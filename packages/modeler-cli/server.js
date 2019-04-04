@@ -11,7 +11,7 @@ module.exports = ({ port, modelFile }) => {
     cache: {},
     packageCache: {},
     basedir: process.cwd(),
-    standalone: "MODELER_MODEL" // the trick - expose model function using window.MODELER_MODEL
+    standalone: "MODELER_MODEL" // main trick - expose model function using window.MODELER_MODEL
   })
     .transform("babelify", { presets: ["@babel/react"] })
     .external("react");

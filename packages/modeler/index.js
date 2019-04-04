@@ -1,51 +1,99 @@
 const React = require("react");
 const { CSG } = require("@jscad/csg");
-const { MeshLambertMaterial } = require("three");
+const { MeshLambertMaterial, MeshBasicMaterial } = require("three");
 
 const { geometryFromPolygons } = require("./utils");
 
 const { useMemo } = React;
 
-const Model = ({ children }) => {
-  const { type, props } = React.Children.only(children);
-  const model = type(props);
-
+const Mesh = ({ model, material }) => {
   const polygons = useMemo(() => model.toPolygons(), [model]);
   const geometry = useMemo(() => geometryFromPolygons(polygons), [polygons]);
 
-  return <mesh geometry={geometry} material={new MeshLambertMaterial()} />;
+  return <mesh geometry={geometry} material={material} />;
 };
 
-// TODO: size
-const Cube = ({ pos = [0, 0, 0] }) =>
-  CSG.cube().transform(CSG.Matrix4x4.translation(pos));
+const Model = ({ children, showParts = true }) => {
+  const { type, props } = React.Children.only(children);
+  let [model, parts] = type(props);
 
-// TODO: r
-const Sphere = ({ pos = [0, 0, 0] }) =>
-  CSG.sphere().transform(CSG.Matrix4x4.translation(pos));
+  if (!parts || !parts.length) {
+    parts = [parts];
+  }
 
-const reduceLeft = (xs, cb) => xs.slice(1).reduce(cb, xs[0]);
+  return (
+    <>
+      <Mesh model={model} material={new MeshLambertMaterial()} />
+      {showParts &&
+        parts.map((part, i) => (
+          <Mesh
+            key={i}
+            model={part}
+            material={
+              new MeshBasicMaterial({ wireframe: true, color: 0x888888 })
+            }
+          />
+        ))}
+    </>
+  );
+};
 
-const Union = ({ children }) => {
+const makeShape = (fnName, defaultValues) => values => {
+  const shape = CSG[fnName]({ ...defaultValues, ...values });
+  return [shape];
+};
+
+const makeOp = fnName => ({ children }) => {
   const childArray = React.Children.toArray(children).map(({ type, props }) =>
     type(props)
   );
 
-  return reduceLeft(childArray, (memo, model) => memo.union(model));
-};
+  return childArray.reduce((memo, [model, parts]) => {
+    parts = parts || [model];
 
-const Subtract = ({ children }) => {
-  const childArray = React.Children.toArray(children).map(({ type, props }) =>
-    type(props)
-  );
+    if (!memo) {
+      return [model, parts];
+    }
 
-  return reduceLeft(childArray, (memo, model) => memo.subtract(model));
+    return [memo[0][fnName](model), [...memo[1], ...parts]];
+  }, undefined);
 };
 
 module.exports = {
   Model,
-  Cube,
-  Sphere,
-  Union,
-  Subtract
+
+  Sphere: makeShape("sphere", { center: [0, 0, 0], radius: 1, resolution: 32 }),
+
+  Cube: makeShape("cube", { center: [0, 0, 0], radius: [1, 1, 1] }),
+  RoundedCube: makeShape("roundedCube", {
+    center: [0, 0, 0],
+    radius: [1, 1, 1],
+    roundradius: 0.1,
+    resolution: 32
+  }),
+
+  Cylinder: makeShape("cylinder", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: 1,
+    resolution: 32
+  }),
+  RoundedCylinder: makeShape("roundedCylinder", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: 1,
+    resolution: 32
+  }),
+  EllipticCylinder: makeShape("cylinderElliptic", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: [1, 1],
+    radiusStart: [1, 1],
+    radiusEnd: [1, 1],
+    resolution: 32
+  }),
+
+  Union: makeOp("union"),
+  Subtract: makeOp("subtract"),
+  Intersect: makeOp("intersect")
 };

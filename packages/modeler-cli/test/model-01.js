@@ -1,8 +1,11 @@
 const React = require("react");
-const { Model, Cube } = require("../../modeler");
+const { Model, Subtract, Cube, Sphere } = require("../../modeler");
 
 module.exports = () => (
   <Model>
-    <Cube />
+    <Subtract>
+      <Cube />
+      <Sphere pos={[0, 1, 0]} />
+    </Subtract>
   </Model>
 );
