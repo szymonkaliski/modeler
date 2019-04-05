@@ -4,7 +4,10 @@ const {
   RoundedCube,
   Sphere,
   Union,
-  Subtract
+  Subtract,
+  Rotate,
+  Translate,
+  Scale
 } = require("../../modeler");
 
 module.exports = () => (
@@ -12,8 +15,10 @@ module.exports = () => (
     <Union>
       <Subtract>
         <Union>
-          <RoundedCube radius={[1, 0.1, 2]} />
           <Sphere center={[1, 0, 0]} radius={1} />
+          <Scale scale={2.0}>
+            <RoundedCube radius={[1, 0.1, 2]} />
+          </Scale>
         </Union>
 
         <Sphere center={[0, 1, 0]} />

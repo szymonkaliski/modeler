@@ -17,7 +17,9 @@ const Model = ({ children, showParts = true }) => {
   const { type, props } = React.Children.only(children);
   let [model, parts] = type(props);
 
-  if (!parts || !parts.length) {
+  if (!parts) {
+    parts = [model];
+  } else if (!parts.length) {
     parts = [parts];
   }
 
@@ -59,6 +61,33 @@ const makeOp = fnName => ({ children }) => {
   }, undefined);
 };
 
+const modelFromOnlyChild = children => {
+  const { type, props } = React.Children.only(children);
+  const [model, parts] = type(props);
+
+  return [model, parts];
+};
+
+const Rotate = ({
+  children,
+  rotationCenter = [0, 0, 0],
+  rotationAxis = [1, 0, 0],
+  degrees = 45
+}) => {
+  const [model, parts] = modelFromOnlyChild(children);
+  return [model.rotate(rotationCenter, rotationAxis, degrees), parts];
+};
+
+const Translate = ({ children, translation = [1, 0, 0] }) => {
+  const [model, parts] = modelFromOnlyChild(children);
+  return [model.translate(translation), parts];
+};
+
+const Scale = ({ children, scale = [2, 2, 2] }) => {
+  const [model, parts] = modelFromOnlyChild(children);
+  return [model.scale(scale), parts];
+};
+
 module.exports = {
   Model,
 
@@ -95,5 +124,9 @@ module.exports = {
 
   Union: makeOp("union"),
   Subtract: makeOp("subtract"),
-  Intersect: makeOp("intersect")
+  Intersect: makeOp("intersect"),
+
+  Rotate,
+  Translate,
+  Scale
 };
