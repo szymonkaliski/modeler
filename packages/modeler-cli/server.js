@@ -1,6 +1,7 @@
 const browserify = require("browserify");
 const chokidar = require("chokidar");
 const createSocket = require("socket.io");
+const fs = require("fs");
 const getPort = require("get-port");
 const path = require("path");
 const watchifyMiddleware = require("watchify-middleware");
@@ -18,19 +19,17 @@ module.exports = ({ port, modelFile }) => {
 
   const watchify = watchifyMiddleware(modelBundler);
 
-  const frontendBundler = browserify(path.join(__dirname, "frontend.js"))
-    .transform("babelify", { presets: ["@babel/react"] })
-    .external("react")
-    .external("react-dom");
+  const server = createServer((req, res) => {
+    const vendorBundle = fs.readFileSync(
+      path.join(__dirname, "bundle/vendor.js")
+    );
 
-  const vendorBundler = browserify()
-    .require("react")
-    .require("react-dom");
+    const frontendBundle = fs.readFileSync(
+      path.join(__dirname, "bundle/frontend.js")
+    );
 
-  const run = ({ scripts }) => {
-    const server = createServer((req, res) => {
-      if (req.url === "/") {
-        res.end(`
+    if (req.url === "/") {
+      res.end(`
         <html>
           <head>
             <title>modeler: ${modelFile}</title>
@@ -45,49 +44,33 @@ module.exports = ({ port, modelFile }) => {
             <script>
               window.MODELER_NAME = "${modelFile.replace(/^\.\//, "")}"
             </script>
-            <script>${scripts.vendor}</script>
-            <script>${scripts.frontend}</script>
+            <script>${vendorBundle}</script>
+            <script>${frontendBundle}</script>
           </body>
         </html>
       `);
-      } else if (req.url.includes(modelFile.replace(/^\.\//, ""))) {
-        watchify(req, res);
-      }
-    });
-
-    const connections = {};
-    const io = createSocket(server);
-
-    io.on("connection", socket => {
-      connections[socket.id] = socket;
-      socket.on("disconnect", () => delete connections[socket.id]);
-    });
-
-    chokidar
-      .watch(modelFile)
-      .on("all", () =>
-        Object.values(connections).forEach(socket => socket.emit("reload"))
-      );
-
-    getPort({ port }).then(port =>
-      server.listen(port, () =>
-        console.log(`running on http://localhost:${port}`)
-      )
-    );
-  };
-  vendorBundler.bundle((err, vendor) => {
-    if (err) {
-      console.log(err);
-      process.exit(1);
+    } else if (req.url.includes(modelFile.replace(/^\.\//, ""))) {
+      watchify(req, res);
     }
-
-    frontendBundler.bundle((err, frontend) => {
-      if (err) {
-        console.log(err);
-        process.exit(1);
-      }
-
-      run({ scripts: { vendor, frontend } });
-    });
   });
+
+  const connections = {};
+  const io = createSocket(server);
+
+  io.on("connection", socket => {
+    connections[socket.id] = socket;
+    socket.on("disconnect", () => delete connections[socket.id]);
+  });
+
+  chokidar
+    .watch(modelFile)
+    .on("all", () =>
+      Object.values(connections).forEach(socket => socket.emit("reload"))
+    );
+
+  getPort({ port }).then(port =>
+    server.listen(port, () =>
+      console.log(`running on http://localhost:${port}`)
+    )
+  );
 };

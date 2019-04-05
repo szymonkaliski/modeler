@@ -7,6 +7,15 @@
   "author": "Szymon Kaliski <hi@szymonkaliski.com> (http://szymonkaliski.com)",
   "license": "MIT",
   "preferGlobal": true,
+  "scripts": {
+    "dev:compile:frontend": "watchify ./frontend.js -o bundle/frontend.js -x react -x react-dom -t [ babelify --presets [ @babel/react ] ]",
+    "dev:compile:vendor": "watchify -o bundle/vendor.js -r react -r react-dom",
+    "dev:compile": "concurrently 'npm run dev:compile:frontend' 'npm run dev:compile:vendor'",
+    "prod:compile:frontend": "browserify ./frontend.js -o bundle/frontend.js -x react -x react-dom -t [ babelify --presets [ @babel/react ] ]",
+    "prod:compile:vendor": "browserify -o bundle/vendor.js -r react -r react-dom",
+    "prod:compile": "concurrently 'npm run prod:compile:frontend' 'npm run prod:compile:vendor'",
+    "prepublish": "npm run prod:compile"
+  },
   "bin": {
     "modeler": "index.js"
   },
@@ -19,6 +28,7 @@
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
     "chokidar": "^2.1.5",
+    "concurrently": "^4.1.0",
     "get-port": "^4.2.0",
     "load-script2": "^1.0.1",
     "react": "^16.8.6",
