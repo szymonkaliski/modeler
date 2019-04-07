@@ -1,5 +1,5 @@
 {
-  "name": "modeler",
+  "name": "modeler-csg",
   "version": "1.0.1-alpha.2",
   "description": "",
   "main": "index.js",
@@ -12,5 +12,5 @@
     "react-three-fiber": "^1.5.3",
     "three": "^0.103.0"
   },
-  "gitHead": "7f9e14cf476381a67d08ec62c1a9e75bf9676198"
+  "gitHead": "b8d76657af5836b253dc1f6c368b48f3592fb33b"
 }
