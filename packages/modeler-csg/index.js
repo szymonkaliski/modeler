@@ -13,9 +13,13 @@ const Mesh = ({ model, material }) => {
   return <mesh geometry={geometry} material={material} />;
 };
 
+const getToModel = node =>
+  Array.isArray(node) ? node : getToModel(node.type(node.props));
+
 const Model = ({ children, showParts = true }) => {
-  const { type, props } = React.Children.only(children);
-  let [model, parts] = type(props);
+  const child = React.Children.only(children);
+
+  let [model, parts] = getToModel(child);
 
   if (!parts) {
     parts = [model];
@@ -46,8 +50,8 @@ const makeShape = (fnName, defaultValues) => values => {
 };
 
 const makeOp = fnName => ({ children }) => {
-  const childArray = React.Children.toArray(children).map(({ type, props }) =>
-    type(props)
+  const childArray = React.Children.toArray(children).map(child =>
+    getToModel(child)
   );
 
   return childArray.reduce((memo, [model, parts]) => {
@@ -62,10 +66,8 @@ const makeOp = fnName => ({ children }) => {
 };
 
 const modelFromOnlyChild = children => {
-  const { type, props } = React.Children.only(children);
-  const [model, parts] = type(props);
-
-  return [model, parts];
+  const child = React.Children.only(children);
+  return getToModel(child);
 };
 
 const Rotate = ({

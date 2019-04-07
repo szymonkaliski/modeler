@@ -1,35 +1,45 @@
+const Module = require("module");
+const babelPresetReact = require("@babel/preset-react").default;
+const babelify = require("babelify");
 const browserify = require("browserify");
 const fs = require("fs");
+const path = require("path");
 const { CSG } = require("@jscad/csg");
 const { stlSerializer } = require("@jscad/io");
+
+const requireString = (str, file) => {
+  const paths = Module._nodeModulePaths(path.dirname(file));
+  const m = new Module(file);
+  m.paths = paths;
+  m._compile(str, file);
+
+  return m.exports;
+};
 
 module.exports = ({ modelFile, outFile }) =>
   browserify(modelFile, {
     node: true,
-    basedir: process.cwd()
+    basedir: process.cwd(),
+    standalone: "MODELER_MODEL"
   })
-    .transform("babelify", { presets: ["@babel/react"] })
+    .transform(babelify, {
+      global: true,
+      presets: [babelPresetReact]
+    })
     .external("react")
     .external("react-dom")
     .external("three")
     .bundle((err, code) => {
-      let evaled;
-
-      try {
-        evaled = eval(code.toString());
-      } catch (err) {
-        console.error(err);
+      if (err) {
+        console.error(err.toString());
         process.exit(1);
       }
 
-      if (evaled) {
-        // black magic below
+      const compiled = requireString(code.toString(), modelFile);
 
-        const createNode = evaled(1); // no idea why `1`
-        const node = createNode();
-
+      if (compiled) {
         // <Model /> allows only one child
-        const firstChild = node.props.children;
+        const firstChild = compiled().props.children;
 
         // we only care about the model, not the parts
         const [model, _] = firstChild.type(firstChild.props);

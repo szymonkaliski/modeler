@@ -8,7 +8,7 @@ const {
   Rotate,
   Translate,
   Scale
-} = require("../../modeler");
+} = require("../../modeler-csg");
 
 module.exports = () => (
   <Model>

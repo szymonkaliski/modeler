@@ -1,3 +1,5 @@
+const babelPresetReact = require("@babel/preset-react").default;
+const babelify = require("babelify");
 const browserify = require("browserify");
 const chokidar = require("chokidar");
 const createSocket = require("socket.io");
@@ -14,7 +16,10 @@ module.exports = ({ port, modelFile }) => {
     basedir: process.cwd(),
     standalone: "MODELER_MODEL" // main trick - expose model function using window.MODELER_MODEL
   })
-    .transform("babelify", { presets: ["@babel/react"] })
+    .transform(babelify, {
+      global: true,
+      presets: [babelPresetReact]
+    })
     .external("react");
 
   const watchify = watchifyMiddleware(modelBundler);
@@ -62,11 +67,10 @@ module.exports = ({ port, modelFile }) => {
     socket.on("disconnect", () => delete connections[socket.id]);
   });
 
-  chokidar
-    .watch(modelFile)
-    .on("all", () =>
-      Object.values(connections).forEach(socket => socket.emit("reload"))
-    );
+  chokidar.watch(modelFile).on("all", () => {
+    console.log(`${new Date().toLocaleString()}\tchange detected, reloading`);
+    Object.values(connections).forEach(socket => socket.emit("reload"));
+  });
 
   getPort({ port }).then(port =>
     server.listen(port, () =>
