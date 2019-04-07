@@ -42,5 +42,6 @@
     "use-socketio": "^1.0.0",
     "watchify-middleware": "^1.8.1",
     "yargs": "^13.2.2"
-  }
+  },
+  "gitHead": "d1fc6056f11113fc43389097ce3ea11d2bcf2002"
 }

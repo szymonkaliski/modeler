@@ -11,5 +11,6 @@
     "react": "^16.8.6",
     "react-three-fiber": "^1.5.3",
     "three": "^0.103.0"
-  }
+  },
+  "gitHead": "d1fc6056f11113fc43389097ce3ea11d2bcf2002"
 }
