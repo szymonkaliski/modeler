@@ -9,6 +9,7 @@
   "dependencies": {
     "@jscad/csg": "^0.7.0",
     "react": "^16.8.6",
+    "react-reconciler": "^0.20.4",
     "react-three-fiber": "^1.5.3",
     "three": "^0.103.0"
   },
