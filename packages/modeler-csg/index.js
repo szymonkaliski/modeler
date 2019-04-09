@@ -1,6 +1,6 @@
 const React = require("react");
 const { CSG } = require("@jscad/csg");
-const { MeshLambertMaterial, MeshBasicMaterial } = require("three");
+const { MeshStandardMaterial, MeshBasicMaterial } = require("three");
 
 const { geometryFromPolygons } = require("./utils");
 
@@ -29,7 +29,16 @@ const Model = ({ children, showParts = true }) => {
 
   return (
     <>
-      <Mesh model={model} material={new MeshLambertMaterial()} />
+      <Mesh
+        model={model}
+        material={
+          new MeshStandardMaterial({
+            roughness: 1.0,
+            metalness: 0.0,
+            color: 0x333333
+          })
+        }
+      />
       {showParts &&
         parts.map((part, i) => (
           <Mesh
