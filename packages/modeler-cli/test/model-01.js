@@ -3,9 +3,14 @@ const { Model, Subtract, Cube, Sphere } = require("../../modeler-csg");
 
 module.exports = () => (
   <Model>
-    <Subtract>
-      <Cube />
-      <Sphere radius={1.3} />
-    </Subtract>
+    <subtract>
+      <cube />
+      <sphere radius={1.3} />
+    </subtract>
+
+    {/* <Subtract> */}
+    {/*   <Cube /> */}
+    {/*   <Sphere radius={1.3} /> */}
+    {/* </Subtract> */}
   </Model>
 );

@@ -1,93 +1,136 @@
 const { CSG } = require("@jscad/csg");
 const Reconciler = require("react-reconciler");
 
-const emptyObject = {};
+const childHostContext = {};
+const rootHostContext = {};
 
-let ROOT_NODE_INSTANCE = null;
-
-const createElement = (type, props) => {
-  console.log("createElement", { type, props });
-
-  const TYPES = {
-    ROOT: new CSG(),
-
-    cube: CSG.cube(),
-    sphere: CSG.sphere()
+const makeOp = op => {
+  const Op = class {
+    appendChild(child) {
+      if (!this.csg) {
+        this.csg = new CSG();
+        this.csg = this.csg.union(child.csg);
+      } else {
+        this.csg = this.csg[op](child.csg);
+      }
+    }
   };
 
-  return TYPES[type];
+  return new Op();
 };
 
-const getHostContextNode = rootNode => {
-  if (typeof rootNode !== undefined) {
-    return (ROOT_NODE_INSTANCE = rootNode);
-  } else {
-    return (ROOT_NODE_INSTANCE = new CSG());
-  }
+const makeShape = (fnName, defaultProps = {}) => props => {
+  const csg = CSG[fnName]({ ...defaultProps, ...props });
+  return { csg };
+};
+
+const createElement = (type, props) => {
+  const TYPES = {
+    ROOT: () => makeOp("union"),
+
+    sphere: makeShape("sphere", {
+      center: [0, 0, 0],
+      radius: 1,
+      resolution: 32
+    }),
+
+    cube: makeShape("cube", { center: [0, 0, 0], radius: [1, 1, 1] }),
+
+    roundedCube: makeShape("roundedCube", {
+      center: [0, 0, 0],
+      radius: [1, 1, 1],
+      roundradius: 0.1,
+      resolution: 32
+    }),
+
+    cylinder: makeShape("cylinder", {
+      start: [0, 0, 0],
+      end: [1, 0, 0],
+      radius: 1,
+      resolution: 32
+    }),
+
+    roundedCylinder: makeShape("roundedCylinder", {
+      start: [0, 0, 0],
+      end: [1, 0, 0],
+      radius: 1,
+      resolution: 32
+    }),
+
+    ellipticCylinder: makeShape("cylinderElliptic", {
+      start: [0, 0, 0],
+      end: [1, 0, 0],
+      radius: [1, 1],
+      radiusStart: [1, 1],
+      radiusEnd: [1, 1],
+      resolution: 32
+    }),
+
+    union: () => makeOp("union"),
+    subtract: () => makeOp("subtract"),
+    intersect: () => makeOp("intersect")
+  };
+
+  const ret = TYPES[type](props);
+  ret.type = type;
+
+  return ret;
 };
 
 const CSGRenderer = new Reconciler({
-  appendChild(parent, child) {
-    console.log("appendChild", { parent, child });
-  },
+  useSyncScheduling: true,
+  supportsMutation: true,
+  isPrimaryRenderer: false,
 
-  createInstance(type, props) {
-    return createElement(type, props);
-  },
+  now: Date.now,
 
-  createTextInstance() {},
-
-  finalizeInitialChildren() {
-    return false;
-  },
-
-  getPublicInstance(inst) {
-    return inst;
-  },
-
-  prepareForCommit() {},
-
-  prepareUpdate() {
-    return true;
-  },
-
-  resetAfterCommit() {},
-
-  resetTextContent() {},
-
-  getRootHostContext(instance) {
-    return getHostContextNode(instance);
+  getRootHostContext() {
+    return rootHostContext;
   },
 
   getChildHostContext() {
-    return emptyObject;
+    return childHostContext;
   },
 
   shouldSetTextContent() {
     return false;
   },
 
-  now() {},
+  prepareForCommit() {},
 
-  useSyncScheduling: true,
+  resetAfterCommit() {},
 
-  supportsMutation: false,
+  createInstance(type, props) {
+    return createElement(type, props);
+  },
 
-  isPrimaryRenderer: false
+  finalizeInitialChildren() {},
+
+  appendInitialChild(parent, child) {
+    console.log("appendInitialChild", { parent, child });
+    parent.appendChild(child);
+  },
+
+  appendChild(parent, child) {
+    console.log("appendChild", { parent, child });
+    parent.appendChild(child);
+  },
+
+  removeChild(parent, child) {
+    console.warn("removeChild", { parent, child });
+  },
+
+  appendChildToContainer(parent, child) {
+    console.log("appendChildToContainer", { parent, child });
+    parent.appendChild(child);
+  },
+
+  getPublicInstance(instance) {
+    return instance;
+  }
 });
-
-class Cube {
-  constructor(root, props) {
-    console.log("CUBE", root, props)
-  }
-
-  appendChild(child) {
-    console.log("CUBE appendChild", child)
-  }
-}
 
 module.exports = {
   createElement,
-  CSGRenderer,
-  Cube
+  CSGRenderer
 };

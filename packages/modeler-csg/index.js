@@ -1,20 +1,29 @@
 const React = require("react");
+const { MeshLambertMaterial } = require("three");
 
+const { useMemo } = React;
+
+const { geometryFromPolygons } = require("./utils");
 const { createElement, CSGRenderer } = require("./reconciler");
 
+let ROOT = null;
+
+const Mesh = ({ model, material }) => {
+  const polygons = useMemo(() => model.toPolygons(), [model]);
+  const geometry = useMemo(() => geometryFromPolygons(polygons), [polygons]);
+
+  return <mesh geometry={geometry} material={material} />;
+};
+
 const Model = ({ children }) => {
-  console.log({ CSGRenderer });
-  console.log({ children });
+  if (!ROOT) {
+    ROOT = CSGRenderer.createContainer(createElement("ROOT"));
+  }
 
-  const container = createElement("ROOT");
-  console.log({ container });
-  const node = CSGRenderer.createContainer(container);
-  console.log({ node });
-  CSGRenderer.updateContainer(children, node, null);
+  CSGRenderer.updateContainer(children, ROOT, null);
+  const model = CSGRenderer.getPublicRootInstance(ROOT);
 
-  console.log({ container });
-
-  return null;
+  return <Mesh model={model.csg} material={new MeshLambertMaterial()} />;
 };
 
 module.exports = {
