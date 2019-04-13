@@ -22,7 +22,15 @@ module.exports = ({ port, modelFile }) => {
     })
     .external("react");
 
-  const watchify = watchifyMiddleware(modelBundler);
+  const watchify = watchifyMiddleware.emitter(modelBundler);
+
+  watchify.on("error", e => {
+    console.log(e.toString());
+  });
+
+  watchify.on("bundle-error", e => {
+    console.log(e.toString());
+  });
 
   const server = createServer((req, res) => {
     const vendorBundle = fs.readFileSync(
@@ -55,7 +63,7 @@ module.exports = ({ port, modelFile }) => {
         </html>
       `);
     } else if (req.url.includes(modelFile.replace(/^\.\//, ""))) {
-      watchify(req, res);
+      watchify.middleware(req, res);
     }
   });
 
