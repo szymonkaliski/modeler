@@ -16,6 +16,8 @@ const Mesh = ({ model, material }) => {
 };
 
 const Model = ({ children, showParts }) => {
+  React.Children.only(children);
+
   if (!ROOT) {
     ROOT = CSGRenderer.createContainer(createElement("ROOT"));
   }

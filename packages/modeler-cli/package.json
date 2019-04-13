@@ -31,6 +31,7 @@
     "concurrently": "^4.1.0",
     "get-port": "^4.2.0",
     "load-script2": "^1.0.1",
+    "modeler-csg": "^1.0.1-alpha.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-three-fiber": "^1.5.3",

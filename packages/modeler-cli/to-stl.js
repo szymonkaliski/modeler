@@ -5,6 +5,7 @@ const browserify = require("browserify");
 const fs = require("fs");
 const path = require("path");
 const { CSG } = require("@jscad/csg");
+const { createElement, CSGRenderer } = require("modeler-csg/reconciler");
 const { stlSerializer } = require("@jscad/io");
 
 const requireString = (str, file) => {
@@ -36,23 +37,21 @@ module.exports = ({ modelFile, outFile }) =>
       }
 
       const compiled = requireString(code.toString(), modelFile);
+      const element = compiled();
+      const firstChild = element.props.children;
 
-      if (compiled) {
-        // <Model /> allows only one child
-        const firstChild = compiled().props.children;
+      const root = CSGRenderer.createContainer(createElement("ROOT"));
+      CSGRenderer.updateContainer(firstChild, root, null);
+      const model = CSGRenderer.getPublicRootInstance(root);
 
-        // we only care about the model, not the parts
-        const [model, _] = firstChild.type(firstChild.props);
+      const MM = 10;
 
-        const MM = 10;
+      const finalModel = model.csg
+        .transform(CSG.Matrix4x4.rotationX(90))
+        .transform(CSG.Matrix4x4.scaling([MM, MM, MM]))
+        .fixTJunctions();
 
-        const finalModel = model
-          .transform(CSG.Matrix4x4.rotationX(90))
-          .transform(CSG.Matrix4x4.scaling([MM, MM, MM]))
-          .fixTJunctions();
+      const rawData = stlSerializer.serialize(finalModel, { binary: false });
 
-        const rawData = stlSerializer.serialize(finalModel, { binary: false });
-
-        fs.writeFileSync(outFile, rawData.join());
-      }
+      fs.writeFileSync(outFile, rawData.join());
     });

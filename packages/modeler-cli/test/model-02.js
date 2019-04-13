@@ -2,7 +2,7 @@ const React = require("react");
 const { Model } = require("../../modeler-csg");
 
 module.exports = () => (
-  <Model>
+  <Model showParts={true}>
     <subtract>
       <union>
         <sphere center={[1, 0, 0]} radius={1} />
