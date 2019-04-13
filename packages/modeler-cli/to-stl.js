@@ -46,11 +46,12 @@ module.exports = ({ modelFile, outFile }) =>
 
         const MM = 10;
 
-        const scaledModel = model.transform(
-          CSG.Matrix4x4.scaling([MM, MM, MM])
-        );
+        const finalModel = model
+          .transform(CSG.Matrix4x4.rotationX(90))
+          .transform(CSG.Matrix4x4.scaling([MM, MM, MM]))
+          .fixTJunctions();
 
-        const rawData = stlSerializer.serialize(scaledModel, { binary: false });
+        const rawData = stlSerializer.serialize(finalModel, { binary: false });
 
         fs.writeFileSync(outFile, rawData.join());
       }

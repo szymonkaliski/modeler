@@ -36,11 +36,11 @@ const Main = () => {
     orbitControls.current.enableZoom = true;
   }, [camera, canvas]);
 
-  const lightPosition = [0, 10, 0];
+  const lightPosition = [0, 100, 0];
 
   return (
     <>
-      <ambientLight color="#333333" />
+      <ambientLight color={0x888888} />
       <spotLight position={lightPosition} />
 
       {DEBUG_LIGHT && (
@@ -51,8 +51,8 @@ const Main = () => {
         />
       )}
 
-      <gridHelper args={[100, 1000, 0xbbbbbb, 0xcccccc]} />
-      <gridHelper args={[100, 100, 0x888888, 0x888888]} />
+      <gridHelper args={[100, 1000, 0xeeeeee, 0xcccccc]} />
+      <gridHelper args={[100, 100, 0xaaaaaa, 0xaaaaaa]} />
 
       {modelFn}
     </>

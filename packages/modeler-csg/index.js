@@ -1,5 +1,5 @@
 const React = require("react");
-const { MeshLambertMaterial, MeshBasicMaterial } = require("three");
+const { MeshStandardMaterial, MeshBasicMaterial } = require("three");
 
 const { useMemo } = React;
 
@@ -25,7 +25,16 @@ const Model = ({ children, showParts }) => {
 
   return (
     <>
-      <Mesh model={model.csg} material={new MeshLambertMaterial()} />
+      <Mesh
+        model={model.csg}
+        material={
+          new MeshStandardMaterial({
+            roughness: 1.0,
+            metalness: 0.0,
+            color: 0x333333
+          })
+        }
+      />
 
       {showParts &&
         (model.parts || []).map((part, i) => (
@@ -41,6 +50,4 @@ const Model = ({ children, showParts }) => {
   );
 };
 
-module.exports = {
-  Model
-};
+module.exports = { Model };
