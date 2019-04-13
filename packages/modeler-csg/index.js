@@ -1,10 +1,10 @@
 const React = require("react");
-const { MeshLambertMaterial } = require("three");
+const { MeshLambertMaterial, MeshBasicMaterial } = require("three");
 
 const { useMemo } = React;
 
-const { geometryFromPolygons } = require("./utils");
 const { createElement, CSGRenderer } = require("./reconciler");
+const { geometryFromPolygons } = require("./utils");
 
 let ROOT = null;
 
@@ -15,7 +15,7 @@ const Mesh = ({ model, material }) => {
   return <mesh geometry={geometry} material={material} />;
 };
 
-const Model = ({ children }) => {
+const Model = ({ children, showParts }) => {
   if (!ROOT) {
     ROOT = CSGRenderer.createContainer(createElement("ROOT"));
   }
@@ -23,7 +23,22 @@ const Model = ({ children }) => {
   CSGRenderer.updateContainer(children, ROOT, null);
   const model = CSGRenderer.getPublicRootInstance(ROOT);
 
-  return <Mesh model={model.csg} material={new MeshLambertMaterial()} />;
+  return (
+    <>
+      <Mesh model={model.csg} material={new MeshLambertMaterial()} />
+
+      {showParts &&
+        (model.parts || []).map((part, i) => (
+          <Mesh
+            key={i}
+            model={part}
+            material={
+              new MeshBasicMaterial({ wireframe: true, color: 0x888888 })
+            }
+          />
+        ))}
+    </>
+  );
 };
 
 module.exports = {

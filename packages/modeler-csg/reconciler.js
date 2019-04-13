@@ -10,8 +10,10 @@ const makeOp = op => {
       if (!this.csg) {
         this.csg = new CSG();
         this.csg = this.csg.union(child.csg);
+        this.parts = [child.csg];
       } else {
         this.csg = this.csg[op](child.csg);
+        this.parts = [...this.parts, child.csg];
       }
     }
   };
@@ -107,21 +109,18 @@ const CSGRenderer = new Reconciler({
   finalizeInitialChildren() {},
 
   appendInitialChild(parent, child) {
-    console.log("appendInitialChild", { parent, child });
     parent.appendChild(child);
   },
 
   appendChild(parent, child) {
-    console.log("appendChild", { parent, child });
     parent.appendChild(child);
   },
 
   removeChild(parent, child) {
-    console.warn("removeChild", { parent, child });
+    console.warn("removeChild not implemented!", { parent, child });
   },
 
   appendChildToContainer(parent, child) {
-    console.log("appendChildToContainer", { parent, child });
     parent.appendChild(child);
   },
 
