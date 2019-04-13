@@ -51,7 +51,7 @@ const Main = () => {
         />
       )}
 
-      <gridHelper args={[100, 1000, 0xeeeeee, 0xeeeeee]} />
+      <gridHelper args={[100, 1000, 0xeeeeee, 0xcccccc]} />
       <gridHelper args={[100, 100, 0xaaaaaa, 0xaaaaaa]} />
 
       {modelFn}

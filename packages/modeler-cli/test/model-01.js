@@ -1,11 +1,11 @@
 const React = require("react");
-const { Model, Subtract, Cube, Sphere } = require("../../modeler-csg");
+const { Model } = require("../../modeler-csg");
 
 module.exports = () => (
   <Model>
-    <Subtract>
-      <Cube />
-      <Sphere radius={1.3} />
-    </Subtract>
+    <subtract>
+      <cube />
+      <sphere radius={1.3} />
+    </subtract>
   </Model>
 );
