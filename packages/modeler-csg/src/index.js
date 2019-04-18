@@ -1,21 +1,29 @@
 const React = require("react");
 const { MeshStandardMaterial, MeshBasicMaterial } = require("three");
 
-const { useMemo } = React;
-
 const { createElement, CSGRenderer } = require("./reconciler");
 const { geometryFromPolygons } = require("./utils");
 
 let ROOT = null;
 
 const Mesh = ({ model, material }) => {
-  const polygons = useMemo(() => model.toPolygons(), [model]);
-  const geometry = useMemo(() => geometryFromPolygons(polygons), [polygons]);
+  const polygons = model.toPolygons();
+  const geometry = geometryFromPolygons(polygons);
 
   return <mesh geometry={geometry} material={material} />;
 };
 
-const Model = ({ children, showParts }) => {
+const Model = ({
+  children,
+  showParts = false,
+  showModel = true,
+  modelMaterial = new MeshStandardMaterial({
+    roughness: 1.0,
+    metalness: 0.0,
+    color: 0x333333
+  }),
+  partsMaterial = new MeshBasicMaterial({ wireframe: true, color: 0x888888 })
+}) => {
   React.Children.only(children);
 
   if (!ROOT) {
@@ -27,29 +35,14 @@ const Model = ({ children, showParts }) => {
 
   return (
     <>
-      <Mesh
-        model={model.csg}
-        material={
-          new MeshStandardMaterial({
-            roughness: 1.0,
-            metalness: 0.0,
-            color: 0x333333
-          })
-        }
-      />
+      {showModel && <Mesh model={model.csg} material={modelMaterial} />}
 
       {showParts &&
         (model.parts || []).map((part, i) => (
-          <Mesh
-            key={i}
-            model={part}
-            material={
-              new MeshBasicMaterial({ wireframe: true, color: 0x888888 })
-            }
-          />
+          <Mesh key={i} model={part} material={partsMaterial} />
         ))}
     </>
   );
 };
 
-module.exports = { Model };
+module.exports = { Mesh, Model };

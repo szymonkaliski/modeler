@@ -5,7 +5,7 @@ const browserify = require("browserify");
 const fs = require("fs");
 const path = require("path");
 const { CSG } = require("@jscad/csg");
-const { createElement, CSGRenderer } = require("modeler-csg/reconciler");
+const { createElement, CSGRenderer } = require("modeler-csg/lib/reconciler");
 const { stlSerializer } = require("@jscad/io");
 
 const requireString = (str, file) => {

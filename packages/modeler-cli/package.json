@@ -28,7 +28,6 @@
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
     "chokidar": "^2.1.5",
-    "concurrently": "^4.1.0",
     "get-port": "^4.2.0",
     "load-script2": "^1.0.1",
     "modeler-csg": "^1.1.0",
@@ -37,12 +36,14 @@
     "react-three-fiber": "^1.5.3",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
-    "swcify": "^1.0.1",
     "three": "^0.103.0",
     "three-orbitcontrols": "^2.102.1",
     "use-socketio": "^1.0.0",
     "watchify-middleware": "^1.8.1",
     "yargs": "^13.2.2"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.0"
   },
   "gitHead": "d5f74080b0a509c6664071f21381a5d9186056cd"
 }

@@ -1,0 +1,22 @@
+{
+  "name": "modeler-csg-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "parcel serve index.html --port 3000"
+  },
+  "keywords": [],
+  "author": "Szymon Kaliski <hi@szymonkaliski.com> (http://szymonkaliski.com)",
+  "license": "MIT",
+  "dependencies": {
+    "modeler-csg": "*",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-three-fiber": "^2.0.8",
+    "three": "^0.103.0"
+  },
+  "devDependencies": {
+    "parcel": "^1.12.3"
+  }
+}

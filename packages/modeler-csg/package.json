@@ -2,16 +2,29 @@
   "name": "modeler-csg",
   "version": "1.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
   "keywords": [],
   "author": "Szymon Kaliski <hi@szymonkaliski.com> (http://szymonkaliski.com)",
   "license": "MIT",
+  "scripts": {
+    "build": "babel --presets @babel/react src/ -d lib/",
+    "prepublish": "npm run build"
+  },
   "dependencies": {
     "@jscad/csg": "^0.7.0",
     "react": "^16.8.6",
     "react-reconciler": "^0.20.4",
+    "three": "^0.103.0"
+  },
+  "peerDependencies": {
+    "react": "^16.8.6",
     "react-three-fiber": "^1.5.3",
     "three": "^0.103.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
+    "@babel/preset-react": "^7.0.0"
   },
   "gitHead": "d5f74080b0a509c6664071f21381a5d9186056cd"
 }
