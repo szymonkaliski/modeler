@@ -2,10 +2,8 @@
 
 Monorepository holding a React library, and CLI tool for [CSG](https://en.wikipedia.org/wiki/Constructive_solid_geometry) modeling.
 
-<p>
-  <div style="text-align:center">
-    <img src="./assets/screen.png">
-  </div>
+<p align="center">
+  <img src="./assets/screen.png">
 </p>
 
 
@@ -41,10 +39,8 @@ ReactDOM.render(
 );
 ```
 
-<p>
-  <div style="text-align:center">
-    <img src="./assets/basic.png">
-  </div>
+<p align="center">
+  <img src="./assets/basic.png">
 </p>
 
 ### API
