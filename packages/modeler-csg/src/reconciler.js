@@ -98,9 +98,21 @@ const CSGRenderer = new Reconciler({
     return false;
   },
 
-  prepareForCommit() {},
+  createTextInstance() {
+    throw new Error('text not supported');
+  },
 
+  prepareUpdate() {},
+  prepareForCommit() {},
   resetAfterCommit() {},
+
+  noTimeout: -1,
+  scheduleTimeout() {
+    throw new Error('timeouts not supported');
+  },
+  cancelTimeout() {
+    throw new Error('timeouts not supported');
+  },
 
   createInstance(type, props) {
     return createElement(type, props);
@@ -113,11 +125,12 @@ const CSGRenderer = new Reconciler({
   },
 
   appendChild(parent, child) {
-    parent.appendChild(child);
+    // no subsequent mutations allowed
+    throw new Error('not supported');
   },
-
   removeChild(parent, child) {
-    console.warn("removeChild not implemented!", { parent, child });
+    // no subsequent mutations allowed
+    throw new Error('not supported');
   },
 
   appendChildToContainer(parent, child) {
@@ -126,6 +139,10 @@ const CSGRenderer = new Reconciler({
 
   getPublicInstance(instance) {
     return instance;
+  },
+
+  clearContainer() {
+    // this is run on unmount, no-op
   }
 });
 
