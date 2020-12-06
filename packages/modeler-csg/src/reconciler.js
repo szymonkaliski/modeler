@@ -26,53 +26,53 @@ const makeShape = (fnName, defaultProps = {}) => props => {
   return { csg };
 };
 
+const TYPES = {
+  ROOT: () => makeOp("union"),
+
+  sphere: makeShape("sphere", {
+    center: [0, 0, 0],
+    radius: 1,
+    resolution: 32
+  }),
+
+  cube: makeShape("cube", { center: [0, 0, 0], radius: [1, 1, 1] }),
+
+  roundedCube: makeShape("roundedCube", {
+    center: [0, 0, 0],
+    radius: [1, 1, 1],
+    roundradius: 0.1,
+    resolution: 32
+  }),
+
+  cylinder: makeShape("cylinder", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: 1,
+    resolution: 32
+  }),
+
+  roundedCylinder: makeShape("roundedCylinder", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: 1,
+    resolution: 32
+  }),
+
+  ellipticCylinder: makeShape("cylinderElliptic", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: [1, 1],
+    radiusStart: [1, 1],
+    radiusEnd: [1, 1],
+    resolution: 32
+  }),
+
+  union: () => makeOp("union"),
+  subtract: () => makeOp("subtract"),
+  intersect: () => makeOp("intersect")
+};
+
 const createElement = (type, props) => {
-  const TYPES = {
-    ROOT: () => makeOp("union"),
-
-    sphere: makeShape("sphere", {
-      center: [0, 0, 0],
-      radius: 1,
-      resolution: 32
-    }),
-
-    cube: makeShape("cube", { center: [0, 0, 0], radius: [1, 1, 1] }),
-
-    roundedCube: makeShape("roundedCube", {
-      center: [0, 0, 0],
-      radius: [1, 1, 1],
-      roundradius: 0.1,
-      resolution: 32
-    }),
-
-    cylinder: makeShape("cylinder", {
-      start: [0, 0, 0],
-      end: [1, 0, 0],
-      radius: 1,
-      resolution: 32
-    }),
-
-    roundedCylinder: makeShape("roundedCylinder", {
-      start: [0, 0, 0],
-      end: [1, 0, 0],
-      radius: 1,
-      resolution: 32
-    }),
-
-    ellipticCylinder: makeShape("cylinderElliptic", {
-      start: [0, 0, 0],
-      end: [1, 0, 0],
-      radius: [1, 1],
-      radiusStart: [1, 1],
-      radiusEnd: [1, 1],
-      resolution: 32
-    }),
-
-    union: () => makeOp("union"),
-    subtract: () => makeOp("subtract"),
-    intersect: () => makeOp("intersect")
-  };
-
   const ret = TYPES[type](props);
   ret.type = type;
 
