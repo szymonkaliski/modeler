@@ -22,7 +22,12 @@ const makeOp = op => {
 };
 
 const makeShape = (fnName, defaultProps = {}) => props => {
-  const csg = CSG[fnName]({ ...defaultProps, ...props });
+  const rawCSG = CSG[fnName]({ ...defaultProps, ...props });
+
+  const csg = props.color
+    ? rawCSG.setColor(props.color)
+    : rawCSG;
+
   return { csg };
 };
 
