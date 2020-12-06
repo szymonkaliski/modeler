@@ -138,7 +138,7 @@ const CSGRenderer = new Reconciler({
   },
 
   getPublicInstance(instance) {
-    return instance;
+    return instance.csg;
   },
 
   clearContainer() {
