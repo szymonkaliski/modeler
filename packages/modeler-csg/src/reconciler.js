@@ -84,7 +84,7 @@ const createElement = (type, props) => {
 
 const createRootElement = () => {
   return {
-    type: 'ROOT',
+    type: "ROOT",
     content: null // only a single content node can exist
   };
 };
@@ -109,7 +109,7 @@ const CSGRenderer = new Reconciler({
   },
 
   createTextInstance() {
-    throw new Error('CSG modeler reconciler: text content not supported');
+    throw new Error("CSG modeler reconciler: text content not supported");
   },
 
   prepareUpdate() {},
@@ -118,10 +118,10 @@ const CSGRenderer = new Reconciler({
 
   noTimeout: -1,
   scheduleTimeout() {
-    throw new Error('CSG modeler reconciler: timeouts not supported');
+    throw new Error("CSG modeler reconciler: timeouts not supported");
   },
   cancelTimeout() {
-    throw new Error('CSG modeler reconciler: timeouts not supported');
+    throw new Error("CSG modeler reconciler: timeouts not supported");
   },
 
   createInstance(type, props) {
@@ -137,19 +137,19 @@ const CSGRenderer = new Reconciler({
   appendChild(parent, child) {
     // no subsequent mutations allowed
     throw new Error(
-      'CSG modeler reconciler: adding/removing children after first render is not supported'
+      "CSG modeler reconciler: adding/removing children after first render is not supported"
     );
   },
   removeChild(parent, child) {
     // no subsequent mutations allowed
     throw new Error(
-      'CSG modeler reconciler: adding/removing children after first render is not supported'
+      "CSG modeler reconciler: adding/removing children after first render is not supported"
     );
   },
 
   appendChildToContainer(parent, child) {
-    if (parent.type !== 'ROOT') {
-      throw new Error('CSG modeler reconciler: unexpected non-root container');
+    if (parent.type !== "ROOT") {
+      throw new Error("CSG modeler reconciler: unexpected non-root container");
     }
 
     if (parent.content === null) {
