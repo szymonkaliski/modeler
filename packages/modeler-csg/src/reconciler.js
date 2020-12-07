@@ -22,61 +22,71 @@ const makeOp = op => {
 };
 
 const makeShape = (fnName, defaultProps = {}) => props => {
-  const csg = CSG[fnName]({ ...defaultProps, ...props });
+  const rawCSG = CSG[fnName]({ ...defaultProps, ...props });
+
+  const csg = props.color
+    ? rawCSG.setColor(props.color)
+    : rawCSG;
+
   return { csg };
 };
 
+const TYPES = {
+  sphere: makeShape("sphere", {
+    center: [0, 0, 0],
+    radius: 1,
+    resolution: 32
+  }),
+
+  cube: makeShape("cube", { center: [0, 0, 0], radius: [1, 1, 1] }),
+
+  roundedCube: makeShape("roundedCube", {
+    center: [0, 0, 0],
+    radius: [1, 1, 1],
+    roundradius: 0.1,
+    resolution: 32
+  }),
+
+  cylinder: makeShape("cylinder", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: 1,
+    resolution: 32
+  }),
+
+  roundedCylinder: makeShape("roundedCylinder", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: 1,
+    resolution: 32
+  }),
+
+  ellipticCylinder: makeShape("cylinderElliptic", {
+    start: [0, 0, 0],
+    end: [1, 0, 0],
+    radius: [1, 1],
+    radiusStart: [1, 1],
+    radiusEnd: [1, 1],
+    resolution: 32
+  }),
+
+  union: () => makeOp("union"),
+  subtract: () => makeOp("subtract"),
+  intersect: () => makeOp("intersect")
+};
+
 const createElement = (type, props) => {
-  const TYPES = {
-    ROOT: () => makeOp("union"),
-
-    sphere: makeShape("sphere", {
-      center: [0, 0, 0],
-      radius: 1,
-      resolution: 32
-    }),
-
-    cube: makeShape("cube", { center: [0, 0, 0], radius: [1, 1, 1] }),
-
-    roundedCube: makeShape("roundedCube", {
-      center: [0, 0, 0],
-      radius: [1, 1, 1],
-      roundradius: 0.1,
-      resolution: 32
-    }),
-
-    cylinder: makeShape("cylinder", {
-      start: [0, 0, 0],
-      end: [1, 0, 0],
-      radius: 1,
-      resolution: 32
-    }),
-
-    roundedCylinder: makeShape("roundedCylinder", {
-      start: [0, 0, 0],
-      end: [1, 0, 0],
-      radius: 1,
-      resolution: 32
-    }),
-
-    ellipticCylinder: makeShape("cylinderElliptic", {
-      start: [0, 0, 0],
-      end: [1, 0, 0],
-      radius: [1, 1],
-      radiusStart: [1, 1],
-      radiusEnd: [1, 1],
-      resolution: 32
-    }),
-
-    union: () => makeOp("union"),
-    subtract: () => makeOp("subtract"),
-    intersect: () => makeOp("intersect")
-  };
-
   const ret = TYPES[type](props);
   ret.type = type;
 
   return ret;
+};
+
+const createRootElement = () => {
+  return {
+    type: "ROOT",
+    content: null // only a single content node can exist
+  };
 };
 
 const CSGRenderer = new Reconciler({
@@ -98,9 +108,21 @@ const CSGRenderer = new Reconciler({
     return false;
   },
 
-  prepareForCommit() {},
+  createTextInstance() {
+    throw new Error("CSG modeler reconciler: text content not supported");
+  },
 
+  prepareUpdate() {},
+  prepareForCommit() {},
   resetAfterCommit() {},
+
+  noTimeout: -1,
+  scheduleTimeout() {
+    throw new Error("CSG modeler reconciler: timeouts not supported");
+  },
+  cancelTimeout() {
+    throw new Error("CSG modeler reconciler: timeouts not supported");
+  },
 
   createInstance(type, props) {
     return createElement(type, props);
@@ -113,23 +135,40 @@ const CSGRenderer = new Reconciler({
   },
 
   appendChild(parent, child) {
-    parent.appendChild(child);
+    // no subsequent mutations allowed
+    throw new Error(
+      "CSG modeler reconciler: adding/removing children after first render is not supported"
+    );
   },
-
   removeChild(parent, child) {
-    console.warn("removeChild not implemented!", { parent, child });
+    // no subsequent mutations allowed
+    throw new Error(
+      "CSG modeler reconciler: adding/removing children after first render is not supported"
+    );
   },
 
   appendChildToContainer(parent, child) {
-    parent.appendChild(child);
+    if (parent.type !== "ROOT") {
+      throw new Error("CSG modeler reconciler: unexpected non-root container");
+    }
+
+    if (parent.content === null) {
+      parent.content = child.csg;
+    } else {
+      parent.content = parent.content.union(child.csg);
+    }
   },
 
   getPublicInstance(instance) {
-    return instance;
+    return instance.csg;
+  },
+
+  clearContainer() {
+    // this is run on unmount, no-op
   }
 });
 
 module.exports = {
-  createElement,
+  createRootElement,
   CSGRenderer
 };

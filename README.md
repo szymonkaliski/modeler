@@ -6,10 +6,11 @@ Monorepository holding a React library, and CLI tool for [CSG](https://en.wikipe
   <img src="./assets/screen.png">
 </p>
 
+The math is provided by the [@jscad/csg package](https://github.com/jscad/csg.js), please see it for more details and to understand the features/limitations of the approach. 3D output is intended for WebGL display or for STL export.
 
 ## `modeler-csg`
 
-Main library, a custom React [reconciler](https://reactjs.org/docs/reconciliation.html), designed to work with [`react-three-fiber`](https://github.com/drcmda/react-three-fiber).
+Main library, a custom React [reconciler](https://reactjs.org/docs/reconciliation.html), designed to work with [`react-three-fiber`](https://github.com/drcmda/react-three-fiber) and [Three.js](https://threejs.org/). Uses [@jscad/csg](https://github.com/jscad/csg.js) under the hood.
 
 ### Installation
 
@@ -64,6 +65,8 @@ API follows (for the most part) [@jscad/csg docs](https://github.com/jscad/csg.j
 - `<cylinder/>` - props: `start`, `end`, `radius`, `resolution`
 - `<roundedCylinder/>` - props: `start`, `end`, `radius`, `resolution`
 - `<ellipticCylinder/>` - props: `start`, `end`, `radius`, `radiusStart`, `radiusEnd`, `resolution`
+
+Each shape also supports a `color` prop that accepts `[0..1, 0..1, 0..1]` RGB values.
 
 #### Operations
 
