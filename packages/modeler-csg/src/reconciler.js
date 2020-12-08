@@ -32,6 +32,8 @@ const makeShape = (fnName, defaultProps = {}) => props => {
 };
 
 const TYPES = {
+  ROOT: () => makeOp("union"),
+
   sphere: makeShape("sphere", {
     center: [0, 0, 0],
     radius: 1,
@@ -80,13 +82,6 @@ const createElement = (type, props) => {
   ret.type = type;
 
   return ret;
-};
-
-const createRootElement = () => {
-  return {
-    type: "ROOT",
-    content: null // only a single content node can exist
-  };
 };
 
 const CSGRenderer = new Reconciler({
@@ -152,11 +147,7 @@ const CSGRenderer = new Reconciler({
       throw new Error("CSG modeler reconciler: unexpected non-root container");
     }
 
-    if (parent.content === null) {
-      parent.content = child.csg;
-    } else {
-      parent.content = parent.content.union(child.csg);
-    }
+    parent.appendChild(child);
   },
 
   getPublicInstance(instance) {
@@ -169,6 +160,6 @@ const CSGRenderer = new Reconciler({
 });
 
 module.exports = {
-  createRootElement,
+  createElement,
   CSGRenderer
 };

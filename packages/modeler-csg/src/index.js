@@ -4,11 +4,11 @@ const { MeshStandardMaterial, MeshBasicMaterial } = require("three");
 const { createElement, CSGRenderer } = require("./reconciler");
 const { geometryFromPolygons } = require("./utils");
 
-let ROOT = null;
-
 const Mesh = ({ model, material }) => {
-  const polygons = model.toPolygons();
-  const geometry = geometryFromPolygons(polygons);
+  const geometry = React.useMemo(() => {
+    const polygons = model.toPolygons();
+    return geometryFromPolygons(polygons);
+  }, [model]);
 
   return <mesh geometry={geometry} material={material} />;
 };
@@ -24,25 +24,60 @@ const Model = ({
   }),
   partsMaterial = new MeshBasicMaterial({ wireframe: true, color: 0x888888 })
 }) => {
-  React.Children.only(children);
+  // read children once
+  const childrenRef = React.useRef(children);
 
-  if (!ROOT) {
-    ROOT = CSGRenderer.createContainer(createElement("ROOT"));
-  }
+  // generate the model
+  const root = React.useMemo(() => {
+    // content accumulator object as fiber container root
+    const rootObject = createElement("ROOT");
 
-  CSGRenderer.updateContainer(children, ROOT, null);
-  const model = CSGRenderer.getPublicRootInstance(ROOT);
+    // create and populate fiber tree
+    const fiberContainer = CSGRenderer.createContainer(rootObject);
+    CSGRenderer.updateContainer(childrenRef.current, fiberContainer, null);
+
+    // read directly from root object
+    // (using getPublicRootInstance on root fiber node does not return entire content)
+    return rootObject;
+  }, []);
 
   return (
     <>
-      {showModel && <Mesh model={model.csg} material={modelMaterial} />}
+      {showModel && <Mesh model={root.csg} material={modelMaterial} />}
 
       {showParts &&
-        (model.parts || []).map((part, i) => (
+        (root.parts || []).map((part, i) => (
           <Mesh key={i} model={part} material={partsMaterial} />
         ))}
     </>
   );
 };
 
-module.exports = { Mesh, Model };
+const Geometry = ({ attach = "geometry", children }) => {
+  // read children once
+  const childrenRef = React.useRef(children);
+
+  // generate the model
+  const model = React.useMemo(() => {
+    // content accumulator object as fiber container root
+    const rootObject = createElement("ROOT");
+
+    // create and populate fiber tree
+    const fiberContainer = CSGRenderer.createContainer(rootObject);
+    CSGRenderer.updateContainer(childrenRef.current, fiberContainer, null);
+
+    // read directly from root object
+    // (using getPublicRootInstance on root fiber node does not return entire content)
+    return rootObject.csg;
+  }, []);
+
+  // convert CSG model polygons to Three
+  const geometry = React.useMemo(() => {
+    const polygons = model.toPolygons();
+    return geometryFromPolygons(polygons);
+  }, [model]);
+
+  return <primitive attach={attach} object={geometry} />;
+};
+
+module.exports = { Mesh, Model, Geometry };
